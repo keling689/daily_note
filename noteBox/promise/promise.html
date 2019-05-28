@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			class Promise{
+				constructor(arg) {
+					this.name = arg.name;
+					this.age = arg.age;
+				    console.log(arg)
+					// sayHello()
+				}
+				getName(){
+					console.log(this.name)
+				}
+				static sayHello(){
+					alert(this.age)
+				}
+			}
+			let demo = new Promise({name:'kelin',age:28})
+		</script>
+	</body>
+</html>

@@ -2,25 +2,86 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title></title>
+		<title>最简异步回调函数</title>
 	</head>
 	<body>
 		<script>
-			class Promise{
-				constructor(arg) {
-					this.name = arg.name;
-					this.age = arg.age;
-				    console.log(arg)
-					// sayHello()
+			// class Promise{
+			// 	constructor(arg) {
+			// 		this.name = arg.name;
+			// 		this.age = arg.age;
+			// 	    console.log(arg)
+			// 		// sayHello()
+			// 	}
+			// 	getName(){
+			// 		console.log(this.name)
+			// 	}
+			// 	static sayHello(){
+			// 		alert(this.age)
+			// 	}
+			// }
+			// let demo = new Promise({name:'kelin',age:28})
+			
+			
+			// promise用法
+			// let temp1 = new Promise((resolve,reject)=>{
+			// 	if(status == 'success'){
+			// 		resolve(res)
+			// 	}else{
+			// 		reject(res)
+			// 	}
+			// })
+			// temp1.then(res=>{
+			// 	
+			// },err=>{
+			// 	
+			// }).catch(err=>{
+			// 	
+			// })
+			// 根据promise用法实现第一版最简单的异步处理函数,只有一次成功回调的异步处理功能
+			class Mypromise{
+				constructor(cb){
+					this.status = 'pending';
+					this.data = null;
+					this.fullfilledCB = (res)=>{console.log(res)};//默认给个函数,以至于在没有延迟的情况下回调不报错
+					this.rejectedCB = (res)=>{console.log(res)};
+					cb(this.resolve,this.reject)		
 				}
-				getName(){
-					console.log(this.name)
+				then(done,fail){
+					if(this.status == 'fulliled'){
+						done(this.data)		
+					}else if(this.status == 'rejected'){
+						fail(this.data)
+					}else if(this.status == 'pending'){
+						this.fullfilledCB = done
+						this.rejectedCB = fail
+					}
 				}
-				static sayHello(){
-					alert(this.age)
+				resolve(data){
+					this.status = 'fullfilled'
+					this.data = data
+					this.fullfilledCB(this.data)
+				}
+				reject(err){
+					this.status = 'rejected'
+					this.data = err
+				    this.rejectedCB(this.data)
 				}
 			}
-			let demo = new Promise({name:'kelin',age:28})
+			
+			let test1 = new Mypromise((resolve,reject)=>{
+				if(Math.random()>0.5){
+					resolve('成功的promise')
+				}else{
+					reject('失败的promise')
+				}
+			})
+			console.log(test1)
+			// test1.then(res=>{
+			// 	console.logt(res)
+			// },err=>{
+			// 	console.log(err)
+			// })
 		</script>
 	</body>
 </html>

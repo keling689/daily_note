@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>最简异步回调函数1</title>
+	</head>
+	<body>
+		<div>
+			最简版promise
+		</div>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<script>
+			class MyPromise{
+				constructor(exector) {
+				    this.status = 'pending',
+					this.value = null;
+					this.fullfilledCB = null;
+					this.rejectedCB = null;
+					
+					let self = this;
+					let resolve = function(data){
+						self.status = 'fulfilled'
+						self.value = data
+					}
+					let reject = function(data){
+						self.status = 'rejected'
+						self.value = data
+					}
+					exector(resolve,reject)
+				}
+				then(cb){
+					
+				}
+			}
+		</script>
+	</body>
+</html>

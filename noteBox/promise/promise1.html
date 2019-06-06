@@ -38,24 +38,59 @@
 				constructor(exector) {
 				    this.status = 'pending',
 					this.value = null;
-					this.fullfilledCB = null;
-					this.rejectedCB = null;
+					this.fullfilledCB = (res)=>{console.log(res)};
+					this.rejectedCB = (res)=>{console.log(res)};
 					
 					let self = this;
 					let resolve = function(data){
 						self.status = 'fulfilled'
 						self.value = data
+						self.fullfilledCB(self.value)
 					}
 					let reject = function(data){
 						self.status = 'rejected'
 						self.value = data
+						self.rejectedCB(self.value)
 					}
 					exector(resolve,reject)
 				}
-				then(cb){
-					
+				then(done,fail){
+					if(this.status == 'fulfilled'){
+						done(this.value)
+					}else if(this.status == 'rejected'){
+						fail(this.value)
+					}else{
+						this.fullfilledCB = done;
+						this.rejectedCB = fail;
+					}
 				}
 			}
+			let demo1 = new MyPromise((resolve,reject)=>{
+				let myNumber = Math.random()
+				myNumber>0.5?resolve(myNumber+'success'):reject(myNumber+'failed')
+			}) 
+			demo1.then(res=>{
+				console.log('thensuccess'+res)
+			},err=>{
+				console.log('thenerr'+err)
+			})
+			let demo2 = new MyPromise((resolve,reject)=>{
+				let myNumber = Math.random()
+				setTimeout(()=>{
+					if(myNumber>0.5){
+						resolve(myNumber+'success')
+					}else{
+						reject(myNumber+'failed')
+					}
+					
+				},1000)
+				
+			}) 
+			demo2.then(res=>{
+				console.log('thensuccess',res)
+			},err=>{
+				console.log('thenerr',err)
+			})
 		</script>
 	</body>
 </html>

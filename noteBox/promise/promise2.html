@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>promise2</title>
+	</head>
+	<body>
+		<div>
+			较完善版加入链式操作
+		</div>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<script>
+			const PENDING = 'pending';
+			const FULFILLED = 'fullilled';
+			const REJECT = 'reject'
+			class MyPromise{
+				constructor(exector) {	
+				    this.status = PENDING;
+					this.value = null;
+					this.fulfilledCB = [];//使用数组接收回调函数
+					this.rejectCB = [];
+					
+					let self = this;
+					
+					let resolve = function(res){
+						self.status = FULFILLED;
+						self.value = res;
+						// 遍历回调成功函数
+						self.fulfilledCB.forEach(item=>{
+							self.value = item(self.value)
+							
+						})
+					}
+					let reject = function(res){
+						self.status = REJECT;
+						self.value = res;
+						// 便利回调失败函数
+						self.rejectCB.forEach(item=>{
+							item(self.value)
+							
+						})
+					}
+					
+					// 捕捉new Promise 对象时的错误
+					try{
+						exector(resolve,reject)
+					}catch(e){
+						throw new Error('构造promise时传入的值不是函数!')
+						//TODO handle the exception
+					}
+				}
+				then(done,fail){
+					if(this.status == FULFILLED){
+						done(this.value)
+					}else if(this.status == REJECT){
+						fail(this.value)
+					}else{
+						done = done || (res => res);
+						fail = fail || (err => err);
+						this.fulfilledCB.push(done)
+						this.rejectCB.push(fail)
+					}
+					//暂未加入兼容其他promise的机制
+					return this
+				}
+			}
+			
+			let demo1 = new MyPromise((resolve,reject) => {
+				let myNumber = Math.random()
+				setTimeout(()=>{
+					if(myNumber>0.5){
+						resolve(myNumber+'success')
+					}else{
+						reject(myNumber+'failed')
+					}
+					
+				},1000)
+			});
+			demo1.then(res=>{
+				console.log(res)
+				return res+'第一次成功'
+			},err=>{
+				console.log(err)
+			}).then(res=>{
+				console.log(res+'第二次成功回调')
+				return res+'第二次成功'
+			}).then(res=>{
+				console.log(res+'第三次成功')
+			})
+		</script>
+		
+		
+	</body>
+</html>

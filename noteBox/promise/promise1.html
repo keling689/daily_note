@@ -38,8 +38,8 @@
 				constructor(exector) {
 				    this.status = 'pending',
 					this.value = null;
-					this.fullfilledCB = (res)=>{console.log(res)};
-					this.rejectedCB = (res)=>{console.log(res)};
+					this.fullfilledCB = (res)=>{console.log(res)};//简单函数,用于一次回调
+					this.rejectedCB = (res)=>{console.log(res)};//简单函数,用于一次回调
 					
 					let self = this;
 					let resolve = function(data){
@@ -52,7 +52,15 @@
 						self.value = data
 						self.rejectedCB(self.value)
 					}
-					exector(resolve,reject)
+						exector(resolve,reject)
+					// try{
+					// 
+					// }catch(e){
+					// 	console.log(e)
+					// 	// throw new Error('传入参数不是函数!')
+					// 	//TODO handle the exception
+					// }
+					
 				}
 				then(done,fail){
 					if(this.status == 'fulfilled'){
@@ -65,6 +73,7 @@
 					}
 				}
 			}
+			//1、同步promise
 			let demo1 = new MyPromise((resolve,reject)=>{
 				let myNumber = Math.random()
 				myNumber>0.5?resolve(myNumber+'success'):reject(myNumber+'failed')
@@ -74,6 +83,8 @@
 			},err=>{
 				console.log('thenerr'+err)
 			})
+			
+			//2、 延迟promise
 			let demo2 = new MyPromise((resolve,reject)=>{
 				let myNumber = Math.random()
 				setTimeout(()=>{
@@ -91,6 +102,29 @@
 			},err=>{
 				console.log('thenerr',err)
 			})
+			
+		/*
+			存在问题
+		*/
+		//3.exector乱传情况
+		let demo3 = new MyPromise(23)
+		demo3.then(res=>{
+			console.log(res)
+		})
+		//4.then回调函数乱传以及链式操作和其他promise兼容问题
+		let demo4 = new MyPromise((resolve,reject)=>{
+			// debugger
+			let myNumber = Math.random()
+			setTimeout(()=>{
+				if(myNumber>0.5){
+					resolve(myNumber+'success')
+				}else{
+					reject(myNumber+'failed')
+				}
+				
+			},1000)
+		})
+		demo4.then(2)
 		</script>
 	</body>
 </html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body style="height: 100%; margin: 0">
+		<div id="container" style="height: 600px;width: 800px;border:1px solid greenyellow;background: black;"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-gl/echarts-gl.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-stat/ecStat.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
+		<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=uIHiL0GPB45bMC44sdfGFpKEkOnL2h8T&__ec_v__=10856824"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>
+		<script type="text/javascript">
+			var dom = document.getElementById("container");
+			var myChart = echarts.init(dom);
+			var app = {};
+			var data = {"code":0,"description":"返回成功","status":0,"data":[{"idxDate":"2019-06-01","preValue":538.91,"hisValue":527.7},{"idxDate":"2019-06-02","preValue":541.25,"hisValue":521.77},{"idxDate":"2019-06-03","preValue":543.32,"hisValue":529.36},{"idxDate":"2019-06-04","preValue":529.54,"hisValue":512.87},{"idxDate":"2019-06-05","preValue":513.42,"hisValue":539.95},{"idxDate":"2019-06-06","preValue":540.1,"hisValue":525.47},{"idxDate":"2019-06-07","preValue":526.02,"hisValue":488.21},{"idxDate":"2019-06-08","preValue":489.54,"hisValue":490.09},{"idxDate":"2019-06-09","preValue":490.42,"hisValue":498.53},{"idxDate":"2019-06-10","preValue":498.41,"hisValue":509.99},{"idxDate":"2019-06-11","preValue":509.7},{"idxDate":"2019-06-12","preValue":509.19},{"idxDate":"2019-06-13","preValue":508.43},{"idxDate":"2019-06-14","preValue":508.21},{"idxDate":"2019-06-15","preValue":508.02},{"idxDate":"2019-06-16","preValue":507.96},{"idxDate":"2019-06-17","preValue":508.13},{"idxDate":"2019-06-18","preValue":508.18},{"idxDate":"2019-06-19","preValue":508.12},{"idxDate":"2019-06-20","preValue":508.2},{"idxDate":"2019-06-21","preValue":508.55},{"idxDate":"2019-06-22","preValue":509.18},{"idxDate":"2019-06-23","preValue":509.21},{"idxDate":"2019-06-24","preValue":509.84},{"idxDate":"2019-06-25","preValue":506.72}]};
+			var _data = data.data
+			option = null;
+			option = {
+			tooltip: {
+				trigger: 'axis'
+			},
+			legend: {
+				data: ['预测值', '实际值'],
+				textStyle:{
+					color:"#ebeaee",
+				},
+				right:'0',
+				icon: 'rect',
+				itemWidth: 10,
+				itemHeight: 10,
+				itemGap: 10,
+				right: 40,
+				top: 20,
+				textStyle:{
+					color:'#fff',
+					fontSize:11
+				}
+				// bottom: 20,
+			},
+			calculable: true,
+			xAxis: [{
+				axisLabel: {
+					// show:false,
+					rotate: 30,
+					// interval: 0,//当设置为0时强制展示所有,不为0时自适应展示
+					margin: 12,
+					// color:'red',
+					fontSize:11
+				},
+				axisLine: {
+					lineStyle: {
+						color: '#CECECE'
+					}
+				},
+				axisTick: {
+					show: false//设置刻度线展示隐藏
+				},
+				type: 'category',
+				boundaryGap: false,
+				data: function() {
+					var list = [];
+					for(var i in _data){
+						list.push(_data[i].idxDate)
+					}
+					return list;
+				}()
+			}],
+			yAxis: [{
+				axisTick: {
+					show: false
+				},
+				type: 'value',
+				axisLine: {
+					lineStyle: {
+						color: '#CECECE'
+					}
+				},
+				splitLine:{
+			　　　　show:false
+		　　 	},
+			}],
+			series: [{
+				name: '预测值',
+				type: 'line',
+				symbol: 'none',//设置线上的点是否出现,默认出现
+				smooth: 0.3,
+				color: ['#49cc7c'],
+				data: function() {
+					var list = [];
+				
+					for(var i in _data){
+						list.push(_data[i].preValue)
+					}
+					return list;
+				}()
+			}, {
+				name: '实际值',
+				type: 'line',
+				symbol: 'none',
+				smooth: 0.3,
+				color: ['#f65e59'],
+				data: function() {
+					var list = [];
+					for(var i in _data){
+						list.push(_data[i].hisValue)
+					}
+					return list;
+				}()
+			}]
+		};;
+			if (option && typeof option === "object") {
+				myChart.setOption(option, true);
+			}
+		</script>
+	</body>
+</html>

@@ -6,7 +6,7 @@
 	</head>
 	<body>
 		<div>
-			较完善版加入链式操作
+			较完善版加入链式操作暂未做兼容其他promise的处理
 		</div>
 		
 		
@@ -112,8 +112,12 @@
 			}).then(res=>{
 				console.log(res+'第二次成功回调')
 				return res+'第二次成功'
+			},err=>{
+				console.log(err)
 			}).then(res=>{
 				console.log(res+'第三次成功')
+			},err=>{
+				console.log(err)
 			})
 		</script>
 		

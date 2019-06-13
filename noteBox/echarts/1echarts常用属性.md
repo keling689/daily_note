@@ -1,0 +1,1 @@
+containLabel: true//grid 区域是否包含坐标轴的刻度标签。

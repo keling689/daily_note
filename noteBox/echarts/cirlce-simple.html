@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body style="height: 100%; margin: 0">
+		<div id="container" style="height: 600px;width: 800px;border:1px solid greenyellow;background: #071640;"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-gl/echarts-gl.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-stat/ecStat.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
+		<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=uIHiL0GPB45bMC44sdfGFpKEkOnL2h8T&__ec_v__=10856824"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>
+		<script type="text/javascript">
+			var dom = document.getElementById("container");
+			var myChart = echarts.init(dom);
+			var app = {};
+			option = null;
+			colorArry = ['#FEEE59', '#2B92EF'];
+			dataArry = ['水工建筑物运行保证率','相关标准'];
+			option = {
+					color: ['#FEEE59', '#2B92EF'],
+					legend: {
+						orient : 'vertical',
+						x: 'middle',
+						y: "22%",
+						itemWidth:15,
+						itemHeight:3,
+						itemGap:2,
+						textStyle:{
+							color:"#ebeaee",
+							fontSize:"10",
+						},
+					},
+					tooltip: {
+						show: true,
+						trigger: 'item',
+						formatter: "{a} : <br />{c}%",
+					},
+					polar: {
+						center: ['50%', '50%'],
+						radius: '150%' //图形大小
+					},
+					angleAxis: {
+						show: false,
+						clockwise:false,
+						startAngle: 90,
+						min: 0,
+						max: 100
+					},
+					radiusAxis: {
+						type: 'category',
+						show: false,
+						data: dataArry
+					},
+					series: [
+						{
+							type: "bar",
+							name: dataArry[0],
+							coordinateSystem: "polar",
+							barWidth: 10, //宽度
+							barCategoryGap: "40%",
+							data: ["76.25"],
+						},
+						{
+							type: "bar",
+							name: dataArry[1],
+							coordinateSystem: "polar",
+							barWidth: 10,
+							barCategoryGap: "40%",
+							data: ["84.09"]
+						}
+					]
+				
+			};
+			if (option && typeof option === "object") {
+				myChart.setOption(option, true);
+			}
+		</script>
+	</body>
+</html>

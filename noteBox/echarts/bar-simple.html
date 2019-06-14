@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 	</head>
 	<body style="height: 100%; margin: 0">
-		<div id="container" style="height: 600px;width: 800px;border:1px solid greenyellow"></div>
+		<div id="container" style="height: 600px;width: 800px;border:1px solid greenyellow;background: #071640;"></div>
 
 
 
@@ -33,16 +33,83 @@
 			var app = {};
 			option = null;
 			option = {
+				  grid: {//设置图标的位置
+						top: '8%',
+						left: '8%',
+						right: '8%',
+						bottom: '8%',
+						containLabel: true
+					},
 				xAxis: {
+					axisLabel: {
+						fontSize:13,
+						color:'#fff',//设置坐标字体颜色			
+					},
+					axisLine: {
+						show: true,//x坐标最底下的线条展示隐藏
+						lineStyle: {
+							color: '#192F60'//设置坐标线颜色,默认设置坐标字体颜色
+						}
+					},
 					type: 'category',
-					data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+					data: ['优化调度', '电站发电', '直购电', '功率因素', '合计'],
+					 axisTick: {
+						show: false//坐标刻度线展示隐藏
+					},
 				},
 				yAxis: {
-					type: 'value'
+					// min: function(value) {
+					// 	return value.min - 20;
+					// },
+					max: function(value) {
+						return Math.round(value.max*1.2/100)*100;
+					},
+					axisLabel: {
+						fontSize:13,
+						color:'#fff',//设置坐标字体颜色			
+					},
+					axisLine: {
+						lineStyle: {
+							color: '#192F60'//设置坐标线颜色,默认设置坐标字体颜色
+						}
+					},
+					type: 'value',
+					 axisTick: {
+						show: false
+					},
+					splitLine:{
+						　　　　show:false//纵坐标斑纹线影藏
+					　},
+				
+					
 				},
 				series: [{
-					data: [120, 200, 150, 80, 70, 110, 130],
-					type: 'bar'
+					data: [800, 660, 160, 70, 1696],
+					type: 'bar',
+					barWidth : 50,//柱图宽度
+                        // barGap:'-50%',//柱图间距
+					label: {
+						normal: {
+							show: true,
+							position: 'top',
+							color:'#fff'
+						}
+					},
+					  itemStyle: {
+                                normal: {
+                                    //每根柱子颜色设置
+                                    color: function(params) {
+                                        let colorList = [
+                                            "#34B0FF",
+                                            "#5CDCE7",
+                                            "#4DCB77",
+                                            "#F1DC01",
+                                            "#F75E5A",
+											];
+                                        return colorList[params.dataIndex];
+                                    }
+                                }
+                            },
 				}]
 			};;
 			if (option && typeof option === "object") {

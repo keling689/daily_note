@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body style="height: 100%; margin: 0">
+		<div id="container" style="height: 600px;width: 800px;border:1px solid greenyellow;background: #071640;"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-gl/echarts-gl.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-stat/ecStat.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
+		<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=uIHiL0GPB45bMC44sdfGFpKEkOnL2h8T&__ec_v__=10856824"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+		<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>
+		<script type="text/javascript">
+			var dom = document.getElementById("container");
+			var myChart = echarts.init(dom);
+			var app = {};
+			option = null;
+			option = {
+				 grid: {//设置图标的位置
+													top: '8%',
+													left: '8%',
+													right: '8%',
+													bottom: '8%',
+													// containLabel: true
+												},
+            xAxis: [
+                {
+					axisLabel: {
+							fontSize:13,
+						color:'#fff',//设置坐标字体颜色
+					
+					},
+                    type: 'category',
+                    data: ['太园站', '莲湖站', '旗岭站', '金湖站'],
+					axisLine:{
+						lineStyle:{
+							color:'#2171AF',
+						},
+					},
+					axisTick: {
+						show: false
+					},
+                }
+            ],
+            yAxis: [
+                {
+					axisLabel: {
+							fontSize:13,
+						color:'#fff',//设置坐标字体颜色
+					
+					},
+					
+                    type: 'value',
+                    min: 0,
+                    max: 1600,
+                    interval: 400,
+                    nameLocation:'center',
+                    nameGap:65,
+                    splitLine:{
+            	　　　　show:false
+			　　 	},
+					axisTick: {
+						show: false
+					},
+					axisLine:{
+						lineStyle:{
+							color:'#2171AF',
+						},
+					},
+                    
+                },
+                {
+					axisLabel: {
+							fontSize:13,
+						color:'#fff',//设置坐标字体颜色
+					
+					},
+                    type: 'value',
+                    min: 0,
+					max: 100,
+                    nameLocation:'center',
+                    nameGap:65,
+                    nameRotate:-90,
+                    splitLine:{
+            	　　　　show:false
+			　　 	},
+					axisTick: {
+						show: false
+					},
+					axisLine:{
+						lineStyle:{
+							color:'#2171AF',
+						},
+					},
+                }
+            ],
+            series: [
+                {
+                    name: '',
+                    itemStyle:{
+                        normal:{
+                            color:'#33B1FE'
+                        }
+					},
+					label:{
+                        show:true,
+						position:'top',
+						color:'#fff',
+                    },
+                    type: 'bar',
+					barWidth : 30,//柱图宽度
+					barGap: 0,//设置组bar的间隔为0
+                    data: [229.6, 530, 684, 296],
+                    // barWidth: '30%'
+                },
+                {
+                    name: '',
+                    itemStyle:{
+                        normal:{
+                             color:'#4772FF'
+                        }
+					},
+					label:{
+                        show:true,
+						position:'top',
+						color:'#fff',
+						formatter:'{c}%',
+                    },
+                    type: 'bar',
+					barWidth : 30,//柱图宽度
+                    yAxisIndex: 1,
+					barGap: 0,//设置组bar的间隔为0
+                    data: [61, 10,78, 13],
+                    // barWidth: '30%'
+                }
+            ]
+		};;
+			if (option && typeof option === "object") {
+				myChart.setOption(option, true);
+			}
+		</script>
+	</body>
+</html>

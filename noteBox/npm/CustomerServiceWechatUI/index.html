@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="VUM - An UI Framework for build mobile apps with vue.js">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="static/resert.css" />
+    <title>粤海水务</title>
+  </head>
+  <body ontouchstart="">
+    <div id="app">
+      <transition name="slide">
+        <router-view></router-view>
+      </transition>
+    </div>
+    <!-- built files will be auto injected -->
+
+    <style>
+      body, html {
+        height: 100%;
+        -webkit-tap-highlight-color: transparent;
+        margin: 0;
+        background: #fff;
+      }
+      a:link,a:visited{
+			 text-decoration:none;  /*超链接无下划线*/
+			}
+      .demos-title,
+      .demos-sub-title {
+        text-align: center;
+        font-size: 1.4rem;
+        color: #3cc51f;
+        font-weight: normal;
+        margin: .5rem 0;
+      }
+
+      .demos-sub-title {
+        font-size: 1.2rem;
+        margin: .4rem 0;
+      }
+
+      .demos-content-padded {
+        padding: 15px;
+      }
+
+      .demos-second-title {
+        text-align: center;
+        font-size: 24px;
+        color: #3cc51f;
+        font-weight: 400;
+        margin: 0 15%;
+      }
+      .page-content .list li {
+      	border-bottom: 1px solid #ccc;
+      }
+      .page-content .list li:first-child {
+      	border-top: 1px solid #ccc;
+      }
+      .page-content .list li .item-title {
+				height: 1.6rem;
+				line-height: 1.6rem;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 14px;
+        padding: 20px;
+      }
+
+      footer a {
+        color: #999;
+        text-decoration: none;
+      }
+    </style>
+ 
+ <script>
+
+ 	   window.onload = function (){
+// 	   	改变title
+ 	   	setInterval(function(){
+ 	   	 		if(document.querySelector('.nav .title')){
+ 	   	 				if(document.title!==document.querySelector('.nav .title').innerText){
+							document.title=document.querySelector('.nav .title').innerText;
+//							移除nav
+							var navTitle = document.querySelector('.nav');
+							navTitle.parentNode.removeChild(navTitle);	
+						}
+ 	   	 		}
+
+		 	},100)
+ 	   }
+
+ </script>
+  </body>
+</html>

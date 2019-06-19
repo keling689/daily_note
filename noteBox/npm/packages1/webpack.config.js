@@ -6,7 +6,10 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
-    filename: 'build.js'
+    filename: 'kelingFirstComponent.min.js',
+		library: "kelingFirstComponent",
+		 libraryTarget: "umd",
+		  umdNamedDefine: true
   },
   module: {
     rules: [

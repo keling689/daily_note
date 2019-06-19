@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>promise3</title>
+	</head>
+	<body>
+		<div>
+			兼容其他promise版本
+		</div>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<script>
+			const PENDING = 'pending';
+			const FULFILLED = 'fulfilled';
+			const REJECTED = 'rejected';
+			class MyPromise{
+				constructor(exector) {
+				    let self = this;
+					this.status = PENDING;
+					this.value = null;
+					this.fulfilledCB = [];
+					this.rejectedCb = [];
+					
+					let resolve = data =>{
+						self.value = data;
+						self.status = FULFILLED;
+						self.fulfilledCB.forEach((item)=>{
+							console.log(item);
+							item(self.value)
+						})
+					}
+					let reject = err =>{
+						self.value = err;
+						self.status = REJECTED;
+						self.rejectedCb.forEach((item)=>{
+							console.log(item);
+							item(self.value)
+						})
+					}
+					
+					try{
+						exector(resolve,reject)
+					}catch(e){
+						//TODO handle the exception
+					}
+				}
+				then(done,fail){
+					// debugger
+					done = typeof done == 'function'?done:res=>res;
+					fail = typeof fail == 'function'?fail:err=>res;
+					if(this.status==FULFILLED){
+						let x = done(this.value);
+						let promise2 = new MyPromise((resolve,reject)=>{
+							resolve(x)
+						})
+						if(x instanceof Promise){
+							console.log(x)
+							return x
+						}else{
+							console.log(x)
+							return promise2
+						}
+						
+					
+					}
+				}
+			}
+			
+			let doneDemo = new MyPromise((resolve,reject)=>{
+				resolve(999)
+			})
+			doneDemo.then(res=>{
+				console.log(res)
+				// debugger
+				// return (res+'第一次')
+				return new Promise((resolve,reject)=>{
+					resolve(res+'第一次')
+				})
+			}).then(res=>{
+				console.log(res)
+				return new Promise((resolve,reject)=>{
+					resolve(res+'第er次')
+				})
+			}).then(res=>{
+				console.log(res)
+			})
+		</script>
+	</body>
+</html>

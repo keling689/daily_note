@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>promise参考4</title>
+	</head>
+	<body>
+
+
+		<script>
+			class Promise {
+				constructor(executor) {
+					this.status = Promise.PENDING
+					this.value = undefined
+					this.reason = undefined
+					// 发布订阅的存储器onResolvedCallbacks, onRejectedCallbacks
+					this.onResolvedCallbacks = []
+					this.onRejectedCallbacks = []
+					this.initBind()
+					this.init(executor)
+				}
+				initBind() {
+					this.resolve = this.resolve.bind(this)
+					this.reject = this.reject.bind(this)
+				}
+				init(executor) {
+					// 防止executor中抛错
+					try {
+						executor(this.resolve, this.reject)
+					} catch (e) {
+						this.reject(e)
+					}
+				}
+				resolve(data) {
+					// 如果resolve中传入一个promise, 那么返回改promise结果
+					if (data instanceof Promise) data.then(this.resolve, this.reject)
+					if (this.status === Promise.PENDING) {
+						this.status = Promise.FULFILLED
+						this.value = data
+						this.onResolvedCallbacks.forEach(fn => fn())
+					}
+				}
+				reject(reason) {
+					if (this.status === Promise.PENDING) {
+						this.status = Promise.REJECTED
+						this.reason = reason
+						this.onRejectedCallbacks.forEach(fn => fn())
+					}
+				}
+				then(onFulfilled, onRejected) {
+					const fulfilledHandle = (resolve, reject) => {
+						// 此处用setTimeout异步才能拿到promise2
+						setTimeout(() => {
+							try {
+								let x = onFulfilled(this.value)
+								Promise.resolvePromise(promise2, x, resolve, reject)
+							} catch (e) {
+								reject(e)
+							}
+						})
+					}
+					const rejectHandle = (resolve, reject) => {
+						setTimeout(() => {
+							try {
+								let x = onRejected(this.reason)
+								Promise.resolvePromise(promise2, x, resolve, reject)
+							} catch (e) {
+								reject(e)
+							}
+						})
+					}
+					// onFulfilled和onRejected定义默认值
+					onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value
+					onRejected = typeof onRejected === 'function' ? onRejected : reason => {
+						throw reason
+					}
+					let promise2 = new Promise((resolve, reject) => {
+						if (this.status === Promise.FULFILLED) {
+							fulfilledHandle(resolve, reject)
+						}
+						if (this.status === Promise.REJECTED) {
+							rejectHandle(resolve, reject)
+						}
+						if (this.status === Promise.PENDING) {
+							this.onResolvedCallbacks.push(() => {
+								fulfilledHandle(resolve, reject)
+							})
+							this.onRejectedCallbacks.push(() => {
+								rejectHandle(resolve, reject)
+							})
+						}
+					})
+					// 返回一个新的promise
+					return promise2
+				}
+				catch (onRejected) {
+					return this.then(null, onRejected)
+				}
+				static resolve() {
+					return new Promise((resolve, reject) => {
+						resolve()
+					})
+				}
+				static reject() {
+					return new Promise((resolve, reject) => {
+						reject()
+					})
+				}
+				finally(callback) {
+					return this.then(
+						data => Promise.resolve(callback()).then(() => data),
+						err => Promise.resolve(callback()).then(() => {
+							throw err
+						})
+					)
+				}
+				static all(promises) {
+					return new Promise((resolve, reject) => {
+						let result = []
+						let count = 0
+						const setResult = (key, value) => {
+							result[key] = value
+							if (++count === promises.length) {
+								resolve(result)
+							}
+						}
+						for (let i = 0; i < promises.length; i++) {
+							let current = promises[i]
+							if (Promise.isPromise(current)) {
+								current.then(data => {
+									setResult(i, data)
+								}, reject)
+							} else {
+								setResult(i, current)
+							}
+						}
+					})
+				}
+				static race(promises) {
+					return new Promise((resolve, reject) => {
+						for (let i = 0; i < promises.length; i++) {
+							let current = promises[i]
+							if (Promise.isPromise(current)) {
+								current.then(resolve, reject)
+							} else {
+								resolve(current)
+							}
+						}
+					})
+				}
+			}
+			Promise.PENDING = 'pending'
+			Promise.FULFILLED = 'fulfilled'
+			Promise.REJECTED = 'rejected'
+			Promise.resolvePromise = (promise2, x, resolve, reject) => {
+				// called防止他人的promise即执行resolve又执行 reject
+				let called
+				if (promise2 === x) throw new TypeError('xxx')
+				if (typeof x === 'function' || typeof x === 'object' && x !== null) {
+					try {
+						let then = x.then
+						if (typeof then === 'function') {
+							then.call(x, y => {
+								if (called) return
+								called = true
+								// 递归解析,总有一个结果then方法返回一个普通值
+								Promise.resolvePromise(promise2, y, resolve, reject)
+							}, e => {
+								if (called) return
+								called = true
+								reject(e)
+							})
+						} else {
+							resolve(x)
+						}
+					} catch (e) {
+						if (called) return
+						called = true
+						reject(e)
+					}
+				} else {
+					resolve(x)
+				}
+			}
+			Promise.isPromise = (obj) => {
+				return typeof obj === 'function' || typeof obj === 'object' && obj !== null && obj.then && typeof obj.then ===
+					'function'
+			}
+			// 延迟对象
+			Promise.deferred = () => {
+				const defer = {}
+				defer.promise = new Promise((resolve, reject) => {
+					defer.resolve = resolve
+					defer.reject = reject
+				})
+				return defer
+			}
+
+			// module.exports = Promise
+			
+			let demo = new Promise((resolve,reject)=>{
+			
+			setTimeout(()=>{
+				if(Math.random()<0.5){
+					let promiseResolve = new Promise((resolve,reject)=>{
+						setTimeout(()=>{
+							if(Math.random()>0.5){
+								resolve('success')
+							}else{
+								reject('failed')
+							}
+						},1000)
+					})
+						resolve(promiseResolve)
+				}else{
+					reject('faild')
+				}
+			
+			},2000)
+		});
+			demo.then(res=>{
+				console.log(res)
+				return new Promise((resolve,reject)=>{
+						setTimeout(()=>{
+						if(Math.random()<0.5){
+								resolve(res+'111111')
+						}else{
+							reject('faild')
+						}
+					
+					},2000)
+					
+				})
+			},err=>{
+				console.log(err)
+			}).then(res=>{
+				console.log(res)
+				return new Promise((resolve,reject)=>{
+						setTimeout(()=>{
+						if(Math.random()<0.5){
+								resolve(res+"22222222222222")
+						}else{
+							reject('faild')
+						}
+					
+					},2000)		
+				})
+			},err=>{
+				console.log(err)
+			}).then(res=>{
+				console.log(res)
+			},err=>{
+				console.log(err)
+			})
+		</script>
+	</body>
+</html>

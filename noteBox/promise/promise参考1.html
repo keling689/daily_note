@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title></title>
+		<title>promise参考1</title>
 	</head>
 	<body>
 		<script>
-			// promise里只有一个参数，叫executor(执行器)
-			function Promise(executor) {
+			// MyPromise里只有一个参数，叫executor(执行器)
+			function MyPromise(executor) {
 				let self = this;
 				self.status = 'pending'; //等待态
 				self.value = undefined; //默认成功的值
@@ -34,27 +34,27 @@
 					}
 				}
 				try { //捕获时发生异常，直接变成reject态，抛出错误
-					executor(resolve, reject); //promise实例创建后，立即执行
+					executor(resolve, reject); //MyPromise实例创建后，立即执行
 				} catch (error) {
 					reject(error);
 				}
 			}
 
-			function resolvePromise(promise2, x, resolve, reject) {
-				if (promise2 === x) { //promise2和x不能相同
+			function resolveMyPromise(MyPromise2, x, resolve, reject) {
+				if (MyPromise2 === x) { //MyPromise2和x不能相同
 					return reject(new TypeError('循环引用了'))
 				}
 				let called; // 表示是否调用过成功或者失败
 				//这里对x的类型进行判断
 				if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
-					try { // 判断x是不是promise，如果x是对象并且x的then方法是函数我们就认为他是一个promise
+					try { // 判断x是不是MyPromise，如果x是对象并且x的then方法是函数我们就认为他是一个MyPromise
 						let then = x.then;
 						if (typeof then === 'function') {
 							then.call(x, function(y) {
 								if (called) return
 								called = true
-								// y可能还是一个promise，在去解析直到返回的是一个普通值
-								resolvePromise(promise2, y, resolve, reject)
+								// y可能还是一个MyPromise，在去解析直到返回的是一个普通值
+								resolveMyPromise(MyPromise2, y, resolve, reject)
 							}, function(err) { //失败
 								if (called) return
 								called = true
@@ -73,7 +73,7 @@
 				}
 			}
 			//在prototype上定义then实例方法
-			Promise.prototype.then = function(onFulfilled, onRejected) {
+			MyPromise.prototype.then = function(onFulfilled, onRejected) {
 				onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : function(value) {
 					return value;
 				}
@@ -81,13 +81,14 @@
 					throw err; //这里需要抛出错误，不能return err，否则会在下一次调用成功态
 				}
 				let self = this;
-				let promise2; //返回的promise
+				let MyPromise2; //返回的MyPromise
 				if (self.status === 'resolved') {
-					promise2 = new Promise(function(resolve, reject) {
+					MyPromise2 = new MyPromise(function(resolve, reject) {
+						//setTimeout异步调用
 						setTimeout(function() {
 							try {
 								let x = onFulfilled(self.value);
-								resolvePromise(promise2, x, resolve, reject);
+								resolveMyPromise(MyPromise2, x, resolve, reject);
 							} catch (e) {
 								reject(e);
 							}
@@ -95,11 +96,11 @@
 					})
 				}
 				if (self.status === 'rejected') {
-					promise2 = new Promise(function(resolve, reject) {
+					MyPromise2 = new MyPromise(function(resolve, reject) {
 						setTimeout(function() {
 							try {
 								let x = onRejected(self.err);
-								resolvePromise(promise2, x, resolve, reject);
+								resolveMyPromise(MyPromise2, x, resolve, reject);
 							} catch (e) {
 								reject(e);
 							}
@@ -109,13 +110,13 @@
 				}
 				// 当调用then时可能没成功 也没失败
 				if (self.status === 'pending') {
-					promise2 = new Promise(function(resolve, reject) {
+					MyPromise2 = new MyPromise(function(resolve, reject) {
 						// 此时没有resolve 也没有reject
 						self.onResolvedCallbacks.push(function() {
 							setTimeout(function() {
 								try {
 									let x = onFulfilled(self.value);
-									resolvePromise(promise2, x, resolve, reject);
+									resolveMyPromise(MyPromise2, x, resolve, reject);
 								} catch (e) {
 									reject(e)
 								}
@@ -125,7 +126,7 @@
 							setTimeout(function() {
 								try {
 									let x = onRejected(self.err);
-									resolvePromise(promise2, x, resolve, reject);
+									resolveMyPromise(MyPromise2, x, resolve, reject);
 								} catch (e) {
 									reject(e);
 								}
@@ -133,18 +134,100 @@
 						});
 					})
 				}
-				return promise2;
+				return MyPromise2;
 			}
-			Promise.defer = Promise.deferred = function() {
+			MyPromise.defer = MyPromise.deferred = function() {
 				let dfd = {};
-				dfd.promise = new Promise(function(resolve, reject) {
+				dfd.MyPromise = new MyPromise(function(resolve, reject) {
 					dfd.resolve = resolve;
 					dfd.reject = reject;
 				});
 				return dfd
 			}
 
-			module.exports = Promise;
+			function resolveMyPromise(MyPromise2, x, resolve, reject) { // 循环引用报错 
+			if(x === MyPromise2){ // reject报错 return reject(new
+				TypeError('Chaining cycle detected for MyPromise');
+			} // 防止多次调用 
+			let called; // x不是null 且x是对象或者函数 
+			if (x != null &&(typeof x === 'object' || typeof x === 'function')) {
+				try { // A+规定，声明then = x的then方法 
+				let then = x.then; 
+				//如果then是函数， 就默认是MyPromise了
+					if (typeof then === 'function') { // 就让then执行 第一个参数是this 后面是成功的回调 和 失败的回调 
+					then.call(x, y => { //成功和失败只能调用一个
+						if (called) return;
+						called = true; // resolve的结果依旧是MyPromise 那就继续解析 
+						resolveMyPromise(MyPromise2, y, resolve,reject);
+				}, err => { // 成功和失败只能调用一个
+				 if (called) return; called = true; reject(err);// 失败了就失败了
+				  }) } else { resolve(x);
+					// 直接成功即可 
+					} } catch (e) { // 也属于失败 
+					if (called) return; called = true; // 取then出错了那就不要在继续执行了
+					 reject(e); } 
+					 } 
+					 else {
+					resolve(x);
+				}
+			}
+			// module.exports = MyPromise;
+			
+			let demo = new MyPromise((resolve,reject)=>{
+			
+			setTimeout(()=>{
+				if(Math.random()<0.5){
+					let promiseResolve = new Promise((resolve,reject)=>{
+						setTimeout(()=>{
+							if(Math.random()>0.5){
+								resolve('success')
+							}else{
+								reject('failed')
+							}
+						},1000)
+					})
+						resolve(promiseResolve)
+				}else{
+					reject('faild')
+				}
+			
+			},2000)
+		});
+			demo.then(res=>{
+				console.log(res)
+				return new Promise((resolve,reject)=>{
+						setTimeout(()=>{
+						if(Math.random()<0.5){
+								resolve(res+'111111')
+						}else{
+							reject('faild')
+						}
+					
+					},2000)
+					
+				})
+			},err=>{
+				console.log(err)
+			}).then(res=>{
+				console.log(res)
+				return new MyPromise((resolve,reject)=>{
+						setTimeout(()=>{
+						if(Math.random()<0.5){
+								resolve(res+"22222222222222")
+						}else{
+							reject('faild')
+						}
+					
+					},2000)		
+				})
+			},err=>{
+				console.log(err)
+			}).then(res=>{
+				console.log(res)
+			},err=>{
+				console.log(err)
+			})
+			
 		</script>
 	</body>
 </html>

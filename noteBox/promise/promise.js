@@ -46,7 +46,23 @@ class MyPromise{
 		let resolvePromise = function(promise2,x,resolve,reject){
 			if(promise2 == x) throw new Error("循环调用！")
 			if(typeof x == "function" || typeof x == "object" && x!==null){
-				
+				let then = x.then;
+				if(typeof then == "function"){
+					try{
+						then.call(x,res=>{
+							resolveMyPromise(promise2,res,resolve,reject)
+						},err=>{
+							reject(err)
+						})
+					}catch(e){
+						reject(err)
+						//TODO handle the exception
+					}
+				}else{
+					resolve(x)
+				}
+			}else{
+				resolve(x)
 			}
 		}
 		if(self.status == "fulfilled"){

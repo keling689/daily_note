@@ -55,18 +55,19 @@ class MyPromise{
 		let isCalled = false;
 		let resolvePromise = function(promise2,x,resolve,reject){
 			if(promise2 == x) throw new Error("循环调用！");
-			// if(x instanceof MyPromise){
-			// 	if(x.status == "pending"){
-			// 		x.then(y=>{
-			// 			resolvePromise(promise2,y,resolve,reject)
-			// 		})
-			// 	}else{
-			// 		x.then(resolve,reject)
-			// 	}
-			// }
+			if(x instanceof MyPromise){
+				if(x.status == "pending"){
+					x.then(y=>{
+						resolvePromise(promise2,y,resolve,reject)
+					})
+				}else{
+					x.then(resolve,reject)
+				}
+			}
 			if(typeof x == "function" || typeof x == "object" && x!==null){	
-				if(typeof then == "function"){
 					let then = x.then;
+				if(typeof then == "function"){
+				
 					try{
 						then.call(x,res=>{
 							if(isCalled) return
@@ -110,8 +111,11 @@ class MyPromise{
 							let x = fail(self.value);
 							resolvePromise(promise2,x,resolve,reject)	
 					}catch(e){
+						console.log(e)
+						console.dir(e)
+						reject(e)
 						//TODO handle the exception
-						throw new Error("成功函数有误!")
+						// throw new Error("成功函数有误!")
 					}
 				})			
 			}))
@@ -125,8 +129,9 @@ class MyPromise{
 							let x = done(self.value);
 							resolvePromise(promise2,x,resolve,reject)
 						}catch(e){
+							reject(e)
 							//TODO handle the exception
-							throw new Error("成功函数有误!")
+							// throw new Error("失败函数有误!")
 						}
 					
 				})
@@ -136,7 +141,7 @@ class MyPromise{
 							resolvePromise(promise2,x,resolve,reject)
 						}catch(e){
 							//TODO handle the exception
-							throw new Error("成功函数有误!")
+							throw new Error("错误函数有误!")
 						}					
 				})
 			}))			
@@ -158,7 +163,7 @@ var demo = new MyPromise((resolve,reject)=>{
 
 demo.then(res=>{
 	console.log(res)
-		return new Promise((resolve,reject)=>{	
+		return new MyPromise((resolve,reject)=>{	
 			setTimeout(()=>{
 					resolve(res+"第一次成功！")
 				},1000)})		

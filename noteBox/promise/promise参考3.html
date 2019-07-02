@@ -26,7 +26,7 @@
 					self.onResolvedCallbacks = []
 					//定义失败的回调数组
 					;
-					self.onRejectedCallbacks = []
+					self.onRejectedCallbacks = []//3、用数组接收的作用
 					//定义成功时执行的函数
 					;
 					let resolve = value => {;
@@ -92,7 +92,7 @@
 					let resolveExecutor = (promise2, x, resolve, reject) => {
 						// 定义个标识 promise2是否已经resolve 或 reject了
 						;
-						let isThenCalled = false
+						let isThenCalled = false//4、？？？？？？？？？？？？？为什么可以调用多次
 						// 2.3.1 如果promise和x引用同一个对象，则以TypeError为原因拒绝promise。
 						;
 						if (promise2 === x) return reject(new TypeError('循环引用！！！'))
@@ -104,13 +104,13 @@
 							 */
 							if (x.status === 'pending') {
 								x.then(function(y) {;
-									resolveExecutor(promise2, y, resolve, reject)
+									resolveExecutor(promise2, y, resolve, reject)//1、？？？？？？？？？？？？？为何要再处理一次resolveExecutor
 								}, reject)
 							} else {
 								// 2.3.2.2 如果/当x被成功时，用相同的值（结果）履行promise。
 								// 2.3.2.3 如果/当x被失败时，用相同的错误原因履行promise。
 								;
-								x.then(resolve, reject)
+								x.then(resolve, reject)//2、？？？？？？？？？？？？？为何不再处理一次resolveExecutor
 							}
 						} else if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
 							// 2.3.3 否则，如果x是一个对象或函数,
@@ -257,57 +257,32 @@
 			}
 			// module.exports = MyPromise;
 			
-				
-				let demo = new MyPromise((resolve,reject)=>{
-				
-				setTimeout(()=>{
-					if(Math.random()<0.5){
-						let promiseResolve = new Promise((resolve,reject)=>{
-							setTimeout(()=>{
-								reject('failed')
-							},1000)
-						})
-							resolve(promiseResolve)
-					}else{
-						reject('faild')
-					}
-				
-				},2000)
-			});
+			var demo = new MyPromise((resolve,reject)=>{
+				debugger
+				if(Math.random()>0.2){
+					setTimeout(()=>{
+						resolve(100)
+					},1000)	
+				}else{
+					reject(200)
+				}
+			})
+			console.dir(demo)
+			
 			demo.then(res=>{
 				console.log(res)
-				return new Promise((resolve,reject)=>{
+					return new MyPromise((resolve,reject)=>{	
 						setTimeout(()=>{
-						if(Math.random()<0.5){
-								resolve(res+'111111')
-						}else{
-							reject('faild')
-						}
-					
-					},2000)
-					
-				})
+								resolve(res+"第一次成功！")
+							},1000)})		
 			},err=>{
-				console.log(err)
-			}).then(res=>{
-				console.log(res)
-				return new MyPromise((resolve,reject)=>{
-						setTimeout(()=>{
-						if(Math.random()<0.5){
-								resolve(res+"22222222222222")
-						}else{
-							reject('faild')
-						}
-					
-					},2000)		
-				})
-			},err=>{
-				console.log(err)
+				console.log("error" + err)
 			}).then(res=>{
 				console.log(res)
 			},err=>{
 				console.log(err)
 			})
+			
 		</script>
 	</body>
 </html>

@@ -140,8 +140,9 @@ class MyPromise{
 							let x = fail(self.reason);
 							resolvePromise(promise2,x,resolve,reject)
 						}catch(e){
+							reject(e)
 							//TODO handle the exception
-							throw new Error("错误函数有误!")
+							// throw new Error("错误函数有误!")
 						}					
 				})
 			}))			
@@ -151,7 +152,7 @@ class MyPromise{
 }
 var demo = new MyPromise((resolve,reject)=>{
 	// debugger
-	if(Math.random()>0.2){
+	if(Math.random()>0.5){
 		setTimeout(()=>{
 			resolve(100)
 		},1000)	

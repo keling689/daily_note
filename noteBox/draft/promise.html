@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>promise</title>
+	</head>
+	<body>
+		<div>
+			
+		</div>
+		
+		<script>
+			
+			
+			class MyPromise{
+				constructor(excutor) {
+				    let self = this;
+					this.status = "pending";
+					this.value = undefined;
+					this.reason = undefined;
+					this.fulfilledCB = [];
+					this.rejectedCB = [];
+					
+					let resolve = function(value){
+						
+						if(value.then !==null && (typeof value.then ==="object" || typeof value.then === "function")){
+							console.log(value.then)
+							return value.then(resolve,reject)
+						}
+						if(self.status === "pending"){
+							setTimeout(()=>{
+								self.status = "fulfilled";
+								self.value = value;
+								self.fulfilledCB.forEach(fn =>{ fn()})
+							})
+							
+						}
+					}
+					
+				let reject = function(reason){
+					if(self.status === "pending"){
+						
+						setTimeout(()=>{
+							self.status = "rejected";
+							self.reason = reason;
+							self.rejectedCB.forEach(fn => {fn()})
+						})
+					
+					}
+				}
+				
+				try{
+					excutor(resolve,reject)
+				}catch(e){
+					throw new Error(e)
+					//TODO handle the exception
+				}
+				}
+				then(done = value => value,fail = reason => reason){
+					let self = this;
+					let resolvePromise=function(promise2,x,resolve,reject){
+						
+						let iscalled = false;//没加判断是否回调
+						if(promise2 === x){
+							throw new Error("重复调用！")
+						}
+						if( x instanceof MyPromise){
+							if(x.status === "pending"){
+								x.then(y=>{
+									if(iscalled) return
+									iscalled = true
+									resolvePromise(promise2,y,resolve,reject)
+								},reject)
+							}else{
+								x.then(resolve,reject)
+							}
+						}
+						if(x !==null && (typeof x ==="object" || typeof x === "function")){
+							let then = x.then;
+							if(typeof then === "function"){
+								try{
+									then.call(x,y=>{
+										if(iscalled) return
+										iscalled = true
+										resolvePromise(promise2,y,resolve,reject)
+									},n=>{
+										if(iscalled) return
+										iscalled = true
+										reject(n)
+									})	
+								}catch(e){
+									if(iscalled) return
+									iscalled = true
+									reject(e)
+									//TODO handle the exception
+								}
+							
+							}else{
+								resolve(x)
+							}
+						}else{
+							resolve(x)
+						}
+					}
+					let promise2;
+					if(this.status === "fulfilled"){	
+						return promise2 = (new MyPromise((resolve,reject)=>{
+							setTimeout(()=>{
+								try{
+									let x = done(self.value)
+									resolvePromise(promise2,x,resolve,reject)
+								}catch(e){
+									reject(e)
+									// throw new Error("成功回调出错！")
+									//TODO handle the exception
+								}
+								
+							})
+						
+						}))
+					}
+					if(this.status === "rejected"){
+				
+						return promise2 = (new MyPromise((resolve,reject)=>{
+							setTimeout(()=>{
+								try{
+									let x = fail(self.reason)
+									resolvePromise(promise2,x,resolve,reject)
+								}catch(e){
+									reject(e)
+									//TODO handle the exception
+										// throw new Error("失败回调出错！")
+								}
+								
+							})
+						}))
+					}
+					if(this.status === "pending"){
+						return promise2 = (new MyPromise((resolve,reject)=>{
+							self.fulfilledCB.push(()=>{
+								try{
+									let x = done(self.value)
+									resolvePromise(promise2,x,resolve,reject)
+								}catch(e){
+									reject(e)
+									// throw new Error("成功回调出错！")
+									//TODO handle the exception
+								}
+							})
+							self.rejectedCB.push(()=>{
+								try{
+									let x = fail(self.reason)
+									resolvePromise(promise2,x,resolve,reject)
+								}catch(e){
+									reject(e)
+									// throw new Error("成功回调出错！")
+									//TODO handle the exception
+								}
+							})
+						}))
+						
+					}
+				}
+				
+			}
+			
+var demo = new MyPromise((resolve,reject)=>{
+	// debugger
+	if(Math.random()>0.5){
+		setTimeout(()=>{
+			resolve(100)
+		},1000)	
+	}else{
+		reject(200)
+	}
+})
+// console.dir(demo)
+
+demo.then(res=>{
+	console.log(res)
+		return new MyPromise((resolve,reject)=>{	
+			setTimeout(()=>{
+					resolve(res+"第一次成功！")
+				},1000)})		
+},err=>{
+	console.log("error" + err)
+}).then(res=>{
+	console.log(res)
+},err=>{
+	console.log(err)
+})
+		</script>
+	</body>
+</html>

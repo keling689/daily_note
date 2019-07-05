@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		
+		
+		
+		<script>
+			const PENDING = "pending";
+			const FULFILLED = "fulfilled";
+			const REJECTED = "rejected"
+			
+			class MyPromise{
+				constructor(excutor) {
+				    let self = this;
+					this.status = PENDING;
+					this.value = undefined;
+					this.reason = undefined;
+					this.fufilledCB = [];
+					this.rejectedCB = [];
+					let resolve= function(value){
+						self.status = FULFILLED;
+						self.value = value;
+						self.fufilledCB.forEach(fn=>{fn()})
+					}
+					let reject = function(reason){
+						self.status = REJECTED;
+						self.reason = reason;
+						self.rejectedCB.forEach(fn=>{fn()})
+					}
+					
+					try{
+						excutor(resolve,reject)
+					}catch(e){
+						//TODO handle the exception
+						throw new Error(e)
+					}
+				}
+				then(done,fail){
+					if(typeof done !=="function")
+					done = value => value;
+					if(typeof fail !=="function")
+					fail = reason => reason
+					let self = this;
+					let resolveMyPromise = function(promise2,x,resolve,reject){
+						if(promise2 === x)
+						throw new Error("重复引用！")
+						if(!!x){
+								if(typeof x === "function" || (typeof x === "object"&&typeof x !=="null")){
+								let then = x.then;
+								if(typeof then === "function"){
+									try{
+										then.call(x,y=>{
+											resolveMyPromise(promise2,y,resolve,reject)
+										},n=>{
+											resolveMyPromise(promise2,n,resolve,reject)
+										})
+									}catch(e){
+										reject(e)
+										//TODO handle the exception
+									}
+								}else{
+									resolve(x)
+								}
+							}else{
+								resolve(x)
+							}
+						}else{
+							resolve(self.value)
+						}
+					
+					}
+					let promise2;
+					if(this.status === FULFILLED){
+						return promise2 = (new MyPromise((resolve,reject)=>{
+							try{
+								let x = done(this.value);
+								setTimeout(()=>{
+									resolveMyPromise(promise2,x,resolve,reject)
+								})	
+							}catch(e){
+								reject(e)
+								//TODO handle the exception
+							}
+						}))
+						
+					}else if(this.status === REJECTED){
+						return promise2 = (new MyPromise((resolve,reject)=>{
+							try{
+								let x = fail(this.reason);
+								setTimeout(()=>{
+									resolveMyPromise(promise2,x,resolve,reject)
+								})	
+							}catch(e){
+								reject(e)
+								//TODO handle the exception
+							}
+						}))
+					}else if(this.status === PENDING){
+						return promise2 = (new MyPromise((resolve,reject)=>{
+							this.fufilledCB.push(()=>{
+								try{
+									let x = done(this.value)
+									setTimeout(()=>{
+										resolveMyPromise(promise2,x,resolve,reject)
+									})
+								}catch(e){
+									reject(e)
+									//TODO handle the exception
+								}
+							}) 
+							this.rejectedCB.push(()=>{
+								try{
+									let x = fail(this.reason)
+									setTimeout(()=>{
+										resolveMyPromise(promise2,x,resolve,reject)
+									})
+								}catch(e){
+									reject(e)
+									//TODO handle the exception
+								}
+							})
+						}))
+					}else{
+						alert("什么情况")
+					}
+					
+				}
+				
+			}
+			
+			let demo = new MyPromise((resolve,reject)=>{
+				setTimeout(()=>{
+					resolve(100)
+				},1000)
+			})
+			demo.then(res=>{
+				console.log(res+"success")
+				 return new MyPromise(((resolve,reject)=>{
+					setTimeout(()=>{
+						resolve(res+"success")
+					},1000)
+				}))	
+			},err=>{
+				console.log(err+"error")
+			}).then(res=>{
+				console.log(res+"success")
+				// return new MyPromise(((resolve,reject)=>{
+				// 	setTimeout(()=>{
+				// 		resolve(res+"success")
+				// 	},1000)
+				// }))	
+			},err=>{
+				console.log(err+"error")
+			}).then(res=>{
+				console.log(res+"success")
+				
+			},err=>{
+				console.log(err+"error")
+			})
+			
+			
+				
+			let demo2 = new Promise((resolve,reject)=>{
+				setTimeout(()=>{
+					resolve(100)
+				},1000)
+			})
+			demo2.then(res=>{
+				console.log(res+"success")
+				 return new Promise(((resolve,reject)=>{
+					setTimeout(()=>{
+						resolve(res+"success")
+					},1000)
+				}))	
+			},err=>{
+				console.log(err+"error")
+			}).then(res=>{
+				console.log(res+"success")
+				 return new Promise(((resolve,reject)=>{
+					setTimeout(()=>{
+						resolve(res+"success")
+					},1000)
+				}))	
+			},err=>{
+				console.log(err+"error")
+			}).then(res=>{
+				console.log(res+"success")
+				
+			},err=>{
+				console.log(err+"error")
+			})
+			
+		</script>
+	</body>
+</html>

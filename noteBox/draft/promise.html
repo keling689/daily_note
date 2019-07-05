@@ -27,6 +27,7 @@
 							console.log(value.then)
 							return value.then(resolve,reject)
 						}
+						
 						if(self.status === "pending"){
 							setTimeout(()=>{
 								self.status = "fulfilled";
@@ -59,7 +60,7 @@
 				then(done = value => value,fail = reason => reason){
 					let self = this;
 					let resolvePromise=function(promise2,x,resolve,reject){
-						
+						debugger
 						let iscalled = false;//没加判断是否回调
 						if(promise2 === x){
 							throw new Error("重复调用！")
@@ -166,13 +167,14 @@
 			
 var demo = new MyPromise((resolve,reject)=>{
 	// debugger
-	if(Math.random()>0.5){
-		setTimeout(()=>{
-			resolve(100)
-		},1000)	
-	}else{
-		reject(200)
-	}
+	setTimeout(()=>{
+		resolve(100)
+	},1000)	
+	// if(Math.random()>0.5){
+	// 	
+	// }else{
+	// 	reject(200)
+	// }
 })
 // console.dir(demo)
 

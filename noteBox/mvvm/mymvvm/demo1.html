@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="http://cdn.bootcss.com/vue/1.0.25/vue.js"></script>
+	</head>
+	<body>
+		
+		<div id ="app">
+			<div><input type="text" v-model="name"></div>
+			<p>{{name}}</p>
+			<p><button @click="alertName"> 弹出名字</button></p>
+		</div>
+		<script>
+			new Vue({
+					el:"#app",
+					data(){
+						return {
+						name:"john",
+					}
+					},
+					methods:{
+						alertName(){
+							alert(this.name)
+						}
+					}
+			})
+		</script>
+	</body>
+</html>
